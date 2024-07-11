@@ -4,7 +4,7 @@
   |\\ | |__  __ /  ` /  \\ |__) |__         }  {
   | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
                                         `._,._,'
-  nf-core/taxonomicfiltering v${version}
+  nf-core/taxonomicfiltering ${version}
 ----------------------------------------------------
 Run Name: $runName
 

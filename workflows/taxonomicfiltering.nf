@@ -6,14 +6,14 @@
 
 include { paramsSummaryLog; paramsSummaryMap } from 'plugin/nf-validation'
 
-def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
-def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
-def summary_params = paramsSummaryMap(workflow)
+//def logo = NfcoreTemplate.logo(workflow, params.monochrome_logs)
+//def citation = '\n' + WorkflowMain.citation(workflow) + '\n'
+//def summary_params = paramsSummaryMap(workflow)
 
 // Print parameter summary log to screen
-log.info logo + paramsSummaryLog(workflow) + citation
+//log.info logo + paramsSummaryLog(workflow) + citation
 
-WorkflowTaxonomicfiltering.initialise(params, log)
+//WorkflowTaxonomicfiltering.initialise(params, log)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -44,11 +44,17 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 */
 
 //
+// SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
+//
+include { CLASSIFICATION                } from '../subworkflows/local/classification'
+include { FILTER                        } from '../subworkflows/local/filter'
+
+//
 // MODULE: Installed directly from nf-core/modules
 //
-include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { FASTQC                        } from '../modules/nf-core/fastqc/main'                                                                                                              
+include { MULTIQC                       } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS   } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,6 +68,7 @@ def multiqc_report = []
 workflow TAXONOMICFILTERING {
 
     ch_versions = Channel.empty()
+    ch_multiqc_files = Channel.empty()
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
@@ -82,6 +89,26 @@ workflow TAXONOMICFILTERING {
     )
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
+    //
+    // SUBWORKFLOW: Classify input reads
+    //
+    CLASSIFICATION (
+        INPUT_CHECK.out.reads,
+        file(params.database)
+    )
+    ch_versions = ch_versions.mix(CLASSIFICATION.out.versions)
+
+    //
+    // SUBWORKFLOW: Filter reads 
+    //
+    FILTER (
+        INPUT_CHECK.out.reads,
+        CLASSIFICATION.out.taxonomic_classification,
+        file(params.ncbi_fullnames),
+        params.taxon_name
+    )
+    ch_versions = ch_versions.mix(FILTER.out.versions)
+
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
@@ -89,17 +116,17 @@ workflow TAXONOMICFILTERING {
     //
     // MODULE: MultiQC
     //
-    workflow_summary    = WorkflowTaxonomicfiltering.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
+    //workflow_summary    = WorkflowTaxonomicfiltering.paramsSummaryMultiqc(workflow, summary_params)
+    //ch_workflow_summary = Channel.value(workflow_summary)
 
-    methods_description    = WorkflowTaxonomicfiltering.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description, params)
-    ch_methods_description = Channel.value(methods_description)
+    //methods_description    = WorkflowTaxonomicfiltering.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description, params)
+    //ch_methods_description = Channel.value(methods_description)
 
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
+    //ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+    //ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(CLASSIFICATION.out.mqc.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),
@@ -116,16 +143,16 @@ workflow TAXONOMICFILTERING {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow.onComplete {
-    if (params.email || params.email_on_fail) {
-        NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
-    }
-    NfcoreTemplate.dump_parameters(workflow, params)
-    NfcoreTemplate.summary(workflow, params, log)
-    if (params.hook_url) {
-        NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
-    }
-}
+//workflow.onComplete {
+ //   if (params.email || params.email_on_fail) {
+  //      NfcoreTemplate.email(workflow, params, summary_params, projectDir, log, multiqc_report)
+   // }
+   // NfcoreTemplate.dump_parameters(workflow, params)
+   // NfcoreTemplate.summary(workflow, params, log)
+   // if (params.hook_url) {
+   //     NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
+   // }
+//}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
