@@ -24,6 +24,8 @@
 <!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
+![TaxonomicFiltering (1)](https://github.com/user-attachments/assets/72a27a89-abf8-475d-8ca2-5f0994cfb1c1)
+
 
 1. Run QC on input reads ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Run taxonomic classification on input reads ([`Kraken2`](https://github.com/DerrickWood/kraken2))
