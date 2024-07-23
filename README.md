@@ -25,8 +25,12 @@
      workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
 <!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
-1. Read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. Present QC for raw reads ([`MultiQC`](http://multiqc.info/))
+1. Run QC on input reads ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+3. Run taxonomic classification on input reads ([`Kraken2`](https://github.com/DerrickWood/kraken2))
+4. Parse taxonomic IDs from fullnames.dmp file (get_ncbi_taxon_list)
+5. Use taxonomic classification and taxids to filter by to get list to reads to retain
+6. Run Seqtk subseq to filter input reads ([`Seqtk`](https://github.com/lh3/seqtk))
+7. Present QC and Classification summary for reads ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 
@@ -60,6 +64,10 @@ Now, you can run the pipeline using:
 nextflow run nf-core/taxonomicfiltering \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
+   --database <path to database> \
+   --ncbi_fullnames <path to ncbi fullnames.dmp file> \
+   --taxon_name < Name of taxon same as in fullnames.dmp at order level to filter by, eg. Primates" \
+   --filtering_mode <"positive" or "negative", determines if unclassified reads are removed or kept> \
    --outdir <OUTDIR>
 ```
 
