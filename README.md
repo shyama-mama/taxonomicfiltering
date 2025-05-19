@@ -60,4 +60,4 @@ You can cite the `taxonomicfiltering` publication as follows:
 >
 > Shyamsundar Ravishankar, Vilma Perez, Roberta Davidson, Xavier Roca-Rada, Divon Lan, Yassine Souilmi & Bastien Llamas
 >
-> _Briefings in Bioinformatics_ 2025 Jan. doi: [doi.org/10.1093/bib/bbae646](https://doi.org/10.1093/bib/bbae646)
+> _Briefings in Bioinformatics_ 2025 Jan. doi: [10.1093/bib/bbae646](https://doi.org/10.1093/bib/bbae646)
