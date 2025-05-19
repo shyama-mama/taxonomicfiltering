@@ -2,10 +2,11 @@
 
 ## Introduction
 
-**taxonomicfiltering** is a bioinformatics pipeline that uses metagenomic classifiers to filter preprocessed (adapters trimmed and/or reads collapsed) ancient DNA sequence data based on its taxonomic profile. 
+Ancient DNA from archeological remains such as bones are a complex mixture of DNA endogenous to the material and sequences from taxa found in the environment (modern human, microbes, etc.). This is a pipeline to filter sequences based on [Kraken2](https://github.com/DerrickWood/kraken2), a metagenomic classifier, to separate endogenous and non-endogenous taxa from pre-processed sequence data (adapters trimmed and/or pair-end reads collapsed)
 
 ![TaxonomicFiltering (1)](https://github.com/user-attachments/assets/72a27a89-abf8-475d-8ca2-5f0994cfb1c1)
 
+Briefly, the pipeline runs FastQC on the input data. [Kraken2](https://github.com/DerrickWood/kraken2) is used to classify the reads with a user specified database. The classification is used to filter reads based on user inputs (e.g extract reads that are classified at the order level 'Primate').
 
 1. Run QC on input reads ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 3. Run taxonomic classification on input reads ([`Kraken2`](https://github.com/DerrickWood/kraken2))
