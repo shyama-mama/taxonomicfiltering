@@ -1,4 +1,5 @@
 # taxonomicfiltering
+### NOTE: The pipeline is not part of nf-core yet. I have created a [request](https://github.com/nf-core/proposals/issues/26). 
 
 ## Introduction
 
@@ -62,3 +63,7 @@ You can cite the `taxonomicfiltering` publication as follows:
 > Shyamsundar Ravishankar, Vilma Perez, Roberta Davidson, Xavier Roca-Rada, Divon Lan, Yassine Souilmi & Bastien Llamas
 >
 > _Briefings in Bioinformatics_ 2025 Jan. doi: [10.1093/bib/bbae646](https://doi.org/10.1093/bib/bbae646)
+
+
+
+
