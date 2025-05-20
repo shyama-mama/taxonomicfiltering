@@ -1,5 +1,6 @@
 # taxonomicfiltering
-### NOTE: The pipeline is not part of nf-core yet. I have created a [request](https://github.com/nf-core/proposals/issues/26). 
+### NOTE: The pipeline is built using nf-core but it is not part of nf-core. 
+#### A similar nf-core pipeline called [detaxizer](https://nf-co.re/detaxizer) exists. I have not tested it but in principle you should get comparable results.
 
 ## Introduction
 
@@ -34,7 +35,7 @@ Each row represents a fastq file (single-end) or a pair of fastq files (paired e
 Now, you can run the pipeline using:
 
 ```bash
-nextflow run nf-core/taxonomicfiltering \
+nextflow run ./taxonomicfiltering \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
    --database <path to database> \
