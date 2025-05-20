@@ -58,6 +58,7 @@ class RowChecker:
         self._second_col = second_col
         self._single_col = single_col
         self._seen = set()
+        self._fastq_seen = set()
         self.modified = []
 
     def validate_and_transform(self, row):
@@ -73,6 +74,7 @@ class RowChecker:
         self._validate_first(row)
         self._validate_second(row)
         self._validate_pair(row)
+        self._validate_fastq_uniqueness(row)
         self._seen.add((row[self._sample_col], row[self._first_col]))
         self.modified.append(row)
 
@@ -112,6 +114,18 @@ class RowChecker:
                 f"The FASTQ file has an unrecognized extension: {filename}\n"
                 f"It should be one of: {', '.join(self.VALID_FORMATS)}"
             )
+
+    def _validate_fastq_uniqueness(self, row):
+        first_basename = Path(row[self._first_col]).name
+        if first_basename in self._fastq_seen:
+            raise AssertionError(f"FASTQ file basename '{first_basename}' is duplicated in the samplesheet.")
+        self._fastq_seen.add(first_basename)
+
+        if row[self._second_col]:
+            second_basename = Path(row[self._second_col]).name
+            if second_basename in self._fastq_seen:
+                raise AssertionError(f"FASTQ file basename '{second_basename}' is duplicated in the samplesheet.")
+            self._fastq_seen.add(second_basename)
 
     def validate_unique_samples(self):
         """

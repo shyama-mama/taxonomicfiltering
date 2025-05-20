@@ -105,7 +105,8 @@ workflow TAXONOMICFILTERING {
         INPUT_CHECK.out.reads,
         CLASSIFICATION.out.taxonomic_classification,
         file(params.ncbi_fullnames),
-        params.taxon_name
+        params.taxon_name,
+        params.filtering_mode
     )
     ch_versions = ch_versions.mix(FILTER.out.versions)
 
@@ -127,6 +128,7 @@ workflow TAXONOMICFILTERING {
     ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(CLASSIFICATION.out.mqc.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(FILTER.out.mqc.collect().ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect(),

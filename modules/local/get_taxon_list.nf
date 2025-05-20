@@ -1,5 +1,5 @@
 process GET_TAXON_LIST {
-    tag "$taxon"
+    tag "$scientific_name"
     label 'process_single'
 
     conda "conda-forge::gawk=5.3.0"
@@ -20,7 +20,7 @@ process GET_TAXON_LIST {
 
     script: // This script is bundled with the pipeline, in nf-core/taxonomicfiltering/bin/
     """
-    grep $scientific_name $ncbi_fullnames | awk '{print \$1;}' | sort | uniq > taxon_list_to_keep.txt
+    grep -e "; $scientific_name;" -e "|\s$scientific_name\s|" $ncbi_fullnames | awk '{print \$1;}' | sort | uniq > taxon_list_to_keep.txt
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
