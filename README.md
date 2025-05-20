@@ -24,12 +24,12 @@ Assuming you already have nextflow [installed](https://www.nextflow.io/docs/late
 git clone https://github.com/shyama-mama/taxonomicfiltering.git
 
 # Download Sample Kraken2 Database and extract 
-wget 'https://github.com/nf-core/test-datasets/raw/eager/databases/kraken/eager_test.tar.gz' & \
+wget 'https://github.com/nf-core/test-datasets/raw/eager/databases/kraken/eager_test.tar.gz' && \
    tar -xvf eager_test.tar.gz
 
 # Download NCBI taxonomy names list
 wget 'https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/new_taxdump.zip'
-mkdir -p ncbi_files & unzip new_taxdump.zip -d ncbi_files
+mkdir -p ncbi_files && unzip new_taxdump.zip -d ncbi_files
 
 # Run test pipline
 # Choose one of singularity, docker or conda depending on what environment you have.
@@ -43,6 +43,7 @@ nextflow run ./taxonomicfiltering/ -profile test,{singularity,docker,conda} \
    --filtering_mode positive --taxon_name "Proboscidea"
 ```
 Example output is in `data/multiqc_report.html`
+
 ## Usage
 
 ### Input File 
@@ -61,6 +62,34 @@ The pipeline requires that all FASTQ file names are unique.
 - `--ncbi_fullnames`: Path to NCBI fullnamelineage.dmp file. Can be downloaded from [here](https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/new_taxdump/). 
 - `--taxon_name`: Scientic taxonomy name as appearing in fullnamelineage.dmp to filter reads by. For example, "Primates" to retain reads classified at order Primates or above. Generally, the order level for a species is a good choice. If you want to differentiate sequences at higher resolution then family, genus or species name can be used.   
 - `--filtering_mode`: One of "positive" or "negative" filtering. More details can be found in 'Database and Filtering Method' section. 
+
+### Output
+The output dir has the following folder structure.
+```
+output/
+├─ fastqc/
+│  ├─ *_fastqc.html
+│  ├─ *_fastqc.zip
+├─ kraken2/
+│  ├─ *.kraken2.report.txt
+│  ├─ *.kraken2.classifiedreads.txt
+├─ get/
+│  ├─ *.filtered_reads.list
+├─ seqtk/
+│  ├─ *_taxa_${taxon_name}_mode_${filtering_mode}_filtered.fq.gz
+├─ multiqc/
+│  ├─ multiqc_report.html
+```
+- `fastqc` contains FastQC results for each FASTQ in the input file
+- `kraken2` for each row in input file 
+  - `.kraken2.report.txt` classification summary, and
+  - `.kraken2.classifiedreads.txt` read header and Kraken2 classification
+- `get` for each row in input file 
+  - `.filtered_reads.list` list of read headers to keep
+- `seqtk` for each FASTQ in input file
+  - `*_taxa_${taxon_name}_mode_${filtering_mode}_filtered.fq.gz` the filtered FASTQ file
+- `multiqc` summary of FastQC, Kraken2 classification and taxonomic filtering. 
+
 
 ## Database and Filtering Method
 The pipeline supports two types of metagenomic filtering. While it was originally designed for ancient DNA (aDNA) studies, it can be applicable to a wide range of sequencing datasets. The types of databases and filtering strategies are described in detail in the following [manuscript](https://doi.org/10.1093/bib/bbae646). 
